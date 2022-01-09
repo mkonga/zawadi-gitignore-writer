@@ -11,5 +11,3 @@ infection.json.dist             export-ignore
 phpcs.xml.dist                  export-ignore
 phpunit.xml.dist                export-ignore
 psalm.xml                       export-ignore
-
-README.md                       export-ignore
