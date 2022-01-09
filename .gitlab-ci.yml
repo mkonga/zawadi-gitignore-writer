@@ -6,10 +6,10 @@ stages:
 .php: &phpXX
   variables:
     COMPOSER_UPDATE_ARGUMENTS: " "
-  image: registry.gitlab.com/tumia/php/7.4-cli-dev
+    PHP_VERSION: "8.1"
+  image: registry.gitlab.com/tumia/php/${PHP_VERSION}-cli-dev
   stage: test
   script:
-    - composer config --global --auth http-basic.repo.packagist.com token $PRIVATE_PACKAGIST_TOKEN
     - composer validate
     - composer update --no-interaction --optimize-autoloader --no-progress ${COMPOSER_UPDATE_ARGUMENTS}
     - XDEBUG_MODE=off phpcs
@@ -22,11 +22,17 @@ php74:
   <<: *phpXX
   variables:
     COMPOSER_UPDATE_ARGUMENTS: " --prefer-lowest "
-  image: registry.gitlab.com/tumia/php/7.4-cli-dev
+    PHP_VERSION: "7.4"
+
+php80:
+  <<: *phpXX
+  variables:
+    PHP_VERSION: "8.0"
 
 php81:
   <<: *phpXX
-  image: registry.gitlab.com/tumia/php/8.1-cli-dev
+  variables:
+    PHP_VERSION: "8.1"
   artifacts:
     reports:
       cobertura: phpunit.coverage.cobertura.xml
