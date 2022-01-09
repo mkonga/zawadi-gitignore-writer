@@ -2,7 +2,7 @@
     "name": "zawadi/gitignore-writer",
     "type": "library",
     "description": "Library for adding and removing items in a gitignore file",
-    "license": "proprietary",
+    "license": "MIT",
     "authors": [ { "name": "Daan van den Berg", "email": "zawadi@doppy.nl" } ],
     "require": {
         "php": "^7.4|^8.0"
