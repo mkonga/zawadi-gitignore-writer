@@ -1,0 +1,21 @@
+# IDE
+/.idea/
+
+# dependencies
+/vendor/
+/composer.phar
+/composer.lock
+
+# docker
+/docker-compose.override.yml
+/docker/local/
+
+# output
+/infection.log
+/phpcs.cache.json
+/phpunit.cache
+/phpunit.coverage.cobertura.xml
+###> mysection >###
+/admin/
+robots.txt
+###< mysection <###

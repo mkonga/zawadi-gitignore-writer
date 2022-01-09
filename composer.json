@@ -1,0 +1,48 @@
+{
+    "name": "zawadi/gitignore-writer",
+    "type": "library",
+    "description": "Library for adding and removing items in a gitignore file",
+    "license": "proprietary",
+    "authors": [ { "name": "Daan van den Berg", "email": "zawadi@doppy.nl" } ],
+    "require": {
+        "php": "^7.4|^8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5.11"
+    },
+    "scripts": {
+        "phpcbf": "XDEBUG_MODE=off phpcbf",
+        "phpcs": "XDEBUG_MODE=off phpcbf --filter='GitModified'; XDEBUG_MODE=off phpcs",
+        "phpunit": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-cobertura=phpunit.coverage.cobertura.xml",
+        "psalm": "XDEBUG_MODE=off psalm",
+        "infection": "XDEBUG_MODE=coverage infection -j25 -n",
+        "pre-commit": [
+            "@analyse",
+            "@test"
+        ],
+        "analyse": [
+            "@phpcs",
+            "@psalm"
+        ],
+        "test": [
+            "@phpunit",
+            "@infection"
+        ]
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "Zawadi\\GitignoreWriter\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Zawadi\\GitignoreWriter\\Tests\\": "tests/"
+        }
+    }
+}

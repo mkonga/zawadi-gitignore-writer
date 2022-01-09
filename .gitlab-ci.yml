@@ -1,0 +1,32 @@
+image: registry.gitlab.com/tumia/php/8.1-cli-dev
+
+stages:
+  - test
+
+.php: &phpXX
+  variables:
+    COMPOSER_UPDATE_ARGUMENTS: " "
+  image: registry.gitlab.com/tumia/php/7.4-cli-dev
+  stage: test
+  script:
+    - composer config --global --auth http-basic.repo.packagist.com token $PRIVATE_PACKAGIST_TOKEN
+    - composer validate
+    - composer update --no-interaction --optimize-autoloader --no-progress ${COMPOSER_UPDATE_ARGUMENTS}
+    - XDEBUG_MODE=off phpcs
+    - XDEBUG_MODE=off psalm
+    - XDEBUG_MODE=coverage ./vendor/bin/phpunit --no-interaction --coverage-cobertura=phpunit.coverage.cobertura.xml
+    - sed -i 's~ filename="~ filename="src/~' ./phpunit.coverage.cobertura.xml
+    - XDEBUG_MODE=coverage infection --no-progress --no-interaction
+
+php74:
+  <<: *phpXX
+  variables:
+    COMPOSER_UPDATE_ARGUMENTS: " --prefer-lowest "
+  image: registry.gitlab.com/tumia/php/7.4-cli-dev
+
+php81:
+  <<: *phpXX
+  image: registry.gitlab.com/tumia/php/8.1-cli-dev
+  artifacts:
+    reports:
+      cobertura: phpunit.coverage.cobertura.xml
