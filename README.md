@@ -32,6 +32,18 @@ $gitIgnoreWriter->replaceSection();
 $entries = $gitIgnoreWriter->getEntries();
 ```
 
+The output in the .gitignore file will look like this:
+
+```gitignore
+###> name-of-mysection >###
+/admin
+/robots.txt
+###< name-of-mysection <###
+```
+
+Leave the comments around the entries, as those are used to find the section again 
+when you need to update it again.
+
 ## Common questions answered
 
 - When the file does not exist, it will be created.
