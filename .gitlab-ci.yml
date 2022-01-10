@@ -12,8 +12,8 @@ stages:
   script:
     - composer validate
     - composer update --no-interaction --optimize-autoloader --no-progress ${COMPOSER_UPDATE_ARGUMENTS}
-    - XDEBUG_MODE=off phpcs
-    - XDEBUG_MODE=off psalm
+    - XDEBUG_MODE=off phpcs --runtime-set testVersion ${PHP_VERSION}
+    - XDEBUG_MODE=off psalm --php-version=${PHP_VERSION}
     - XDEBUG_MODE=coverage ./vendor/bin/phpunit --no-interaction --coverage-cobertura=phpunit.coverage.cobertura.xml
     - sed -i 's~ filename="~ filename="src/~' ./phpunit.coverage.cobertura.xml
     - XDEBUG_MODE=coverage infection --no-progress --no-interaction
