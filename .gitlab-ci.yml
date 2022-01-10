@@ -17,22 +17,42 @@ stages:
     - XDEBUG_MODE=coverage ./vendor/bin/phpunit --no-interaction --coverage-cobertura=phpunit.coverage.cobertura.xml
     - sed -i 's~ filename="~ filename="src/~' ./phpunit.coverage.cobertura.xml
     - XDEBUG_MODE=coverage infection --no-progress --no-interaction
+  artifacts:
+    reports:
+      cobertura: phpunit.coverage.cobertura.xml
 
-php74:
+test_php74_lowest:
   <<: *phpXX
   variables:
     COMPOSER_UPDATE_ARGUMENTS: " --prefer-lowest "
     PHP_VERSION: "7.4"
 
-php80:
+test_php74:
   <<: *phpXX
   variables:
+    COMPOSER_UPDATE_ARGUMENTS: ""
+    PHP_VERSION: "7.4"
+
+test_php80_lowest:
+  <<: *phpXX
+  variables:
+    COMPOSER_UPDATE_ARGUMENTS: " --prefer-lowest "
     PHP_VERSION: "8.0"
 
-php81:
+test_php80:
   <<: *phpXX
   variables:
+    COMPOSER_UPDATE_ARGUMENTS: ""
+    PHP_VERSION: "8.0"
+
+test_php81_lowest:
+  <<: *phpXX
+  variables:
+    COMPOSER_UPDATE_ARGUMENTS: " --prefer-lowest "
     PHP_VERSION: "8.1"
-  artifacts:
-    reports:
-      cobertura: phpunit.coverage.cobertura.xml
+
+test_php81:
+  <<: *phpXX
+  variables:
+    COMPOSER_UPDATE_ARGUMENTS: ""
+    PHP_VERSION: "8.1"
