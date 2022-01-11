@@ -3,11 +3,12 @@ image: registry.gitlab.com/tumia/php/8.1-cli-dev
 stages:
   - test
 
-.php: &phpXX
-  variables:
-    COMPOSER_UPDATE_ARGUMENTS: " "
-    PHP_VERSION: "8.1"
+test:
   image: registry.gitlab.com/tumia/php/${PHP_VERSION}-cli-dev
+  parallel:
+    matrix:
+      - PHP_VERSION: ["7.4", "8.0", "8.1"]
+      - COMPOSER_UPDATE_ARGUMENTS: [ "", " --prefer-lowest "]
   stage: test
   script:
     - composer validate
@@ -20,39 +21,3 @@ stages:
   artifacts:
     reports:
       cobertura: phpunit.coverage.cobertura.xml
-
-test_php74_lowest:
-  <<: *phpXX
-  variables:
-    COMPOSER_UPDATE_ARGUMENTS: " --prefer-lowest "
-    PHP_VERSION: "7.4"
-
-test_php74:
-  <<: *phpXX
-  variables:
-    COMPOSER_UPDATE_ARGUMENTS: ""
-    PHP_VERSION: "7.4"
-
-test_php80_lowest:
-  <<: *phpXX
-  variables:
-    COMPOSER_UPDATE_ARGUMENTS: " --prefer-lowest "
-    PHP_VERSION: "8.0"
-
-test_php80:
-  <<: *phpXX
-  variables:
-    COMPOSER_UPDATE_ARGUMENTS: ""
-    PHP_VERSION: "8.0"
-
-test_php81_lowest:
-  <<: *phpXX
-  variables:
-    COMPOSER_UPDATE_ARGUMENTS: " --prefer-lowest "
-    PHP_VERSION: "8.1"
-
-test_php81:
-  <<: *phpXX
-  variables:
-    COMPOSER_UPDATE_ARGUMENTS: ""
-    PHP_VERSION: "8.1"
