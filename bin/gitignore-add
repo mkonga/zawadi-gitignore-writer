@@ -1,0 +1,20 @@
+#!/bin/php
+<?php
+
+use Zawadi\GitignoreWriter\GitignoreWriter;
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// get all arguments
+$arguments = array_slice($argv, 1);
+
+if (count($arguments) < 3) {
+    echo 'minimal of 3 arguments required';
+    exit(1);
+}
+
+$filename = array_shift($arguments);
+$section = array_shift($arguments);
+
+$gitignoreWriter = new GitignoreWriter($filename, $section);
+$gitignoreWriter->updateSection($arguments);
