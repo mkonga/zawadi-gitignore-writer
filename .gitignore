@@ -15,7 +15,3 @@
 /phpcs.cache.json
 /phpunit.cache
 /phpunit.coverage.cobertura.xml
-###> mysection >###
-/admin/
-robots.txt
-###< mysection <###
