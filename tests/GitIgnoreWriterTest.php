@@ -15,11 +15,23 @@ use Zawadi\GitignoreWriter\MemoryFilesystem;
  */
 final class GitIgnoreWriterTest extends TestCase
 {
+    protected string $filename;
+    protected MemoryFilesystem $filesystem;
+
+    public function setUp(): void
+    {
+        $this->filename = tempnam(sys_get_temp_dir(), 'phpunit.gitignorewriter.test');
+        $this->filesystem = new MemoryFilesystem();
+    }
+
+    public function tearDown(): void
+    {
+        unlink($this->filename);
+    }
+
     public function testNoFile(): void
     {
-        $filesystem = new MemoryFilesystem();
-        $filename = './.gitignore';
-        $gitignoreWriter = new GitignoreWriter($filename, 'mysection', $filesystem);
+        $gitignoreWriter = new GitignoreWriter($this->filename, 'mysection', $this->filesystem);
 
         // check new file contains no entries
         self::assertCount(0, $gitignoreWriter->getEntries());
@@ -27,10 +39,10 @@ final class GitIgnoreWriterTest extends TestCase
         // add 2 entries and check they are stored
         $gitignoreWriter->updateSection(['/admin/', 'robots.txt']);
         self::assertEquals(['/admin/', 'robots.txt'], $gitignoreWriter->getEntries());
-        self::assertTrue($filesystem->isFile($filename));
+        self::assertTrue($this->filesystem->isFile($this->filename));
 
         // check contents of file
-        $fileContents = (string)$filesystem->getFileContents($filename);
+        $fileContents = (string)$this->filesystem->getFileContents($this->filename);
         self::assertStringContainsString('###> mysection >###', $fileContents);
         self::assertStringContainsString('/admin/', $fileContents);
         self::assertStringContainsString('robots.txt', $fileContents);
@@ -43,7 +55,7 @@ final class GitIgnoreWriterTest extends TestCase
         self::assertEquals([], $gitignoreWriter->getEntries());
 
         // after removing everything, the file should be empty
-        $fileContents = (string)$filesystem->getFileContents($filename);
+        $fileContents = (string)$this->filesystem->getFileContents($this->filename);
         self::assertStringNotContainsString('###> mysection >###', $fileContents);
         self::assertStringNotContainsString('/admin/', $fileContents);
         self::assertStringNotContainsString('robots.txt', $fileContents);
@@ -52,53 +64,52 @@ final class GitIgnoreWriterTest extends TestCase
 
     public function testAppend(): void
     {
-        $filesystem = new MemoryFilesystem();
-        $filename = './.gitignore';
-        $gitignoreWriter = new GitignoreWriter($filename, 'mysection', $filesystem);
+        $gitignoreWriter = new GitignoreWriter($this->filename, 'mysection', $this->filesystem);
 
         $initialContent = 'Some random lines' . PHP_EOL .
             'More lines';
 
         // put something random in
-        $filesystem->writeToFile($filename, $initialContent);
+        $this->filesystem->writeToFile($this->filename, $initialContent);
 
         // add single entry
         $gitignoreWriter->updateSection(['robots.txt']);
         self::assertEquals(['robots.txt'], $gitignoreWriter->getEntries());
         // check original content is still there
-        self::assertStringStartsWith($initialContent . PHP_EOL, (string)$filesystem->getFileContents($filename));
+        self::assertStringStartsWith(
+            $initialContent . PHP_EOL,
+            (string)$this->filesystem->getFileContents($this->filename)
+        );
 
         // check removal
         $gitignoreWriter->updateSection([], ['robots.txt']);
         self::assertEquals([], $gitignoreWriter->getEntries());
-        self::assertEquals($initialContent, $filesystem->getFileContents($filename));
+        self::assertEquals($initialContent, $this->filesystem->getFileContents($this->filename));
     }
 
     public function testRemovalBetween(): void
     {
-        $filesystem = new MemoryFilesystem();
-        $filename = './.gitignore';
-        $gitignoreWriter = new GitignoreWriter($filename, 'mysection', $filesystem);
+        $gitignoreWriter = new GitignoreWriter($this->filename, 'mysection', $this->filesystem);
 
         $initialContent = 'Some random lines' . PHP_EOL .
             'More lines' . PHP_EOL;
         $endingContent = PHP_EOL . 'More random lines' . PHP_EOL .
             'Something different' . PHP_EOL;
 
-        $filesystem->writeToFile($filename, $initialContent);
+        $this->filesystem->writeToFile($this->filename, $initialContent);
         $gitignoreWriter->updateSection(['robots.txt']);
-        $filesystem->appendToFile($filename, $endingContent);
+        $this->filesystem->appendToFile($this->filename, $endingContent);
 
         // check file contents
         self::assertEquals(['robots.txt'], $gitignoreWriter->getEntries());
-        $fileContents = (string)$filesystem->getFileContents($filename);
+        $fileContents = (string)$this->filesystem->getFileContents($this->filename);
         self::assertStringContainsString($initialContent, $fileContents);
         self::assertStringContainsString($endingContent, $fileContents);
 
         // remove section
         $gitignoreWriter->updateSection([], ['robots.txt']);
         self::assertEquals([], $gitignoreWriter->getEntries());
-        $fileContents = (string)$filesystem->getFileContents($filename);
+        $fileContents = (string)$this->filesystem->getFileContents($this->filename);
         self::assertStringContainsString($initialContent . $endingContent, $fileContents);
     }
 
@@ -107,31 +118,29 @@ final class GitIgnoreWriterTest extends TestCase
      */
     public function testReplaceBetween(string $initialContent, string $endingContent): void
     {
-        $filesystem = new MemoryFilesystem();
-        $filename = './.gitignore';
-        $gitignoreWriter = new GitignoreWriter($filename, 'mysection', $filesystem);
+        $gitignoreWriter = new GitignoreWriter($this->filename, 'mysection', $this->filesystem);
 
-        $filesystem->writeToFile($filename, $initialContent);
+        $this->filesystem->writeToFile($this->filename, $initialContent);
         $gitignoreWriter->updateSection(['robots.txt']);
-        $filesystem->appendToFile($filename, $endingContent);
+        $this->filesystem->appendToFile($this->filename, $endingContent);
 
         // check file contents
         self::assertEquals(['robots.txt'], $gitignoreWriter->getEntries());
-        $fileContents = (string)$filesystem->getFileContents($filename);
+        $fileContents = (string)$this->filesystem->getFileContents($this->filename);
         self::assertStringContainsString($initialContent, $fileContents);
         self::assertStringContainsString($endingContent, $fileContents);
 
         // replace section
         $gitignoreWriter->replaceSection(['something.different.txt']);
         self::assertEquals(['something.different.txt'], $gitignoreWriter->getEntries());
-        $fileContents = (string)$filesystem->getFileContents($filename);
+        $fileContents = (string)$this->filesystem->getFileContents($this->filename);
         self::assertStringContainsString($initialContent, $fileContents);
         self::assertStringContainsString($endingContent, $fileContents);
 
         // remove section
         $gitignoreWriter->replaceSection();
         self::assertEquals([], $gitignoreWriter->getEntries());
-        $fileContents = (string)$filesystem->getFileContents($filename);
+        $fileContents = (string)$this->filesystem->getFileContents($this->filename);
         self::assertStringContainsString($initialContent . $endingContent, $fileContents);
     }
 
@@ -173,11 +182,9 @@ final class GitIgnoreWriterTest extends TestCase
 
     public function testNoNewEntriesWithNoEntries(): void
     {
-        $filesystem = new MemoryFilesystem();
-        $filename = './.gitignore';
-        $gitignoreWriter = new GitignoreWriter($filename, 'mysection', $filesystem);
+        $gitignoreWriter = new GitignoreWriter($this->filename, 'mysection', $this->filesystem);
 
-        self::assertFalse($filesystem->isFile($filename));
+        self::assertFalse($this->filesystem->isFile($this->filename));
         $gitignoreWriter->updateSection([]);
         self::assertEquals([], $gitignoreWriter->getEntries());
 
@@ -196,16 +203,14 @@ final class GitIgnoreWriterTest extends TestCase
 
     public function testUniqueEntries(): void
     {
-        $filesystem = new MemoryFilesystem();
-        $filename = './.gitignore';
-        $gitignoreWriter = new GitignoreWriter($filename, 'mysection', $filesystem);
+        $gitignoreWriter = new GitignoreWriter($this->filename, 'mysection', $this->filesystem);
 
         $gitignoreWriter->updateSection(['same.txt', 'other.txt', 'same.txt']);
 
         self::assertEquals(['other.txt', 'same.txt'], $gitignoreWriter->getEntries());
         self::assertEquals(
             1,
-            substr_count((string)$filesystem->getFileContents($filename), 'other.txt')
+            substr_count((string)$this->filesystem->getFileContents($this->filename), 'other.txt')
         );
     }
 
@@ -214,9 +219,7 @@ final class GitIgnoreWriterTest extends TestCase
      */
     public function testSectionNames(string $sectionName): void
     {
-        $filesystem = new MemoryFilesystem();
-        $filename = './.gitignore';
-        $gitignoreWriter = new GitignoreWriter($filename, $sectionName, $filesystem);
+        $gitignoreWriter = new GitignoreWriter($this->filename, $sectionName, $this->filesystem);
         $gitignoreWriter->updateSection(['irrelevant.txt']);
 
         self::assertEquals(['irrelevant.txt'], $gitignoreWriter->getEntries());
@@ -250,26 +253,24 @@ final class GitIgnoreWriterTest extends TestCase
 
     public function testDuplicateSections(): void
     {
-        $filesystem = new MemoryFilesystem();
-        $filename = './.gitignore';
-        $filesystem->writeToFile($filename, 'Base contents' . PHP_EOL . 'containing 2 lines');
-        $gitignoreWriter = new GitignoreWriter($filename, 'coolsection', $filesystem);
+        $this->filesystem->writeToFile($this->filename, 'Base contents' . PHP_EOL . 'containing 2 lines');
+        $gitignoreWriter = new GitignoreWriter($this->filename, 'coolsection', $this->filesystem);
 
         // fill with initial values and get contents
         $gitignoreWriter->updateSection(['initial.txt']);
-        $initialContents = (string)$filesystem->getFileContents($filename);
+        $initialContents = (string)$this->filesystem->getFileContents($this->filename);
 
         // replace contents
         $gitignoreWriter->updateSection(['secondary.txt'], ['initial.txt']);
-        $filesystem->appendToFile($filename, 'Random content' . PHP_EOL);
-        $filesystem->appendToFile($filename, $initialContents);
-        $filesystem->appendToFile($filename, PHP_EOL . 'More Random content' . PHP_EOL);
+        $this->filesystem->appendToFile($this->filename, 'Random content' . PHP_EOL);
+        $this->filesystem->appendToFile($this->filename, $initialContents);
+        $this->filesystem->appendToFile($this->filename, PHP_EOL . 'More Random content' . PHP_EOL);
 
         // check that file now contains 2 sections
         self::assertEquals(
             2,
             substr_count(
-                (string)$filesystem->getFileContents($filename),
+                (string)$this->filesystem->getFileContents($this->filename),
                 '###> coolsection >###'
             )
         );
@@ -285,7 +286,7 @@ final class GitIgnoreWriterTest extends TestCase
         self::assertEquals(
             1,
             substr_count(
-                (string)$filesystem->getFileContents($filename),
+                (string)$this->filesystem->getFileContents($this->filename),
                 '###> coolsection >###'
             )
         );
@@ -298,9 +299,7 @@ final class GitIgnoreWriterTest extends TestCase
      */
     public function testOrdering(array $inputEntries, array $expectedFoundEntries): void
     {
-        $filesystem = new MemoryFilesystem();
-        $filename = './.gitignore';
-        $gitignoreWriter = new GitignoreWriter($filename, 'coolsection', $filesystem);
+        $gitignoreWriter = new GitignoreWriter($this->filename, 'coolsection', $this->filesystem);
         $gitignoreWriter->updateSection($inputEntries);
         self::assertEquals($expectedFoundEntries, $gitignoreWriter->getEntries());
     }
