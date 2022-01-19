@@ -257,7 +257,7 @@ final class GitIgnoreWriterTest extends TestCase
 
         // fill with initial values and get contents
         $gitignoreWriter->updateSection(['initial.txt']);
-        $initialContents = (string) $filesystem->getFileContents($filename);
+        $initialContents = (string)$filesystem->getFileContents($filename);
 
         // replace contents
         $gitignoreWriter->updateSection(['secondary.txt'], ['initial.txt']);
@@ -289,5 +289,53 @@ final class GitIgnoreWriterTest extends TestCase
                 '###> coolsection >###'
             )
         );
+    }
+
+    /**
+     * @param list<string> $inputEntries
+     * @param list<string> $expectedFoundEntries
+     * @dataProvider dataProviderTestOrdering
+     */
+    public function testOrdering(array $inputEntries, array $expectedFoundEntries): void
+    {
+        $filesystem = new MemoryFilesystem();
+        $filename = './.gitignore';
+        $gitignoreWriter = new GitignoreWriter($filename, 'coolsection', $filesystem);
+        $gitignoreWriter->updateSection($inputEntries);
+        self::assertEquals($expectedFoundEntries, $gitignoreWriter->getEntries());
+    }
+
+    /**
+     * @return iterable
+     * @psalm-return iterable<string, array{'inputEntries': list<string>, 'expectedFoundEntries': list<string>}>
+     */
+    public function dataProviderTestOrdering(): iterable
+    {
+        yield 'normal' => [
+            'inputEntries' => ['standard', 'before'],
+            'expectedFoundEntries' => ['before', 'standard']
+        ];
+        yield 'withinvert' => [
+            'inputEntries' => ['!aaaa', 'standard', 'before'],
+            'expectedFoundEntries' => ['before', 'standard', '!aaaa']
+        ];
+        yield 'biggercollection' => [
+            'inputEntries' => [
+                'random',
+                '!stan',
+                'standard',
+                '!bbbbb',
+                'before',
+                '!aaaa',
+            ],
+            'expectedFoundEntries' => [
+                'before',
+                'random',
+                'standard',
+                '!aaaa',
+                '!bbbbb',
+                '!stan'
+            ]
+        ];
     }
 }

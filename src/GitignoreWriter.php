@@ -6,6 +6,9 @@ namespace Zawadi\GitignoreWriter;
 
 class GitignoreWriter
 {
+    private const SMALLER = -1;
+    private const BIGGER = 1;
+
     protected string $filename;
     protected string $section;
     protected FilesystemInterface $filesystem;
@@ -32,11 +35,26 @@ class GitignoreWriter
     {
         $originalEntries = $this->getEntries();
         $newEntries = array_unique(array_merge(array_diff($originalEntries, $remove), $add));
-        sort($newEntries);
-        if ($originalEntries == $newEntries) {
+        usort($newEntries, ['self', 'compareEntries']);
+        if ($originalEntries === $newEntries) {
             return;
         }
         $this->writeEntries($newEntries);
+    }
+
+    private function compareEntries(string $left, string $right): int
+    {
+        $leftIsInvert = str_starts_with($left, '!');
+        $rightIsInvert = str_starts_with($right, '!');
+
+        if ($leftIsInvert !== $rightIsInvert) {
+            if ($leftIsInvert === true) {
+                return self::BIGGER;
+            }
+            return self::SMALLER;
+        }
+
+        return $left <=> $right;
     }
 
     /**
