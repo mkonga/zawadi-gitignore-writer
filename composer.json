@@ -44,5 +44,9 @@
         "psr-4": {
             "Zawadi\\GitignoreWriter\\Tests\\": "tests/"
         }
-    }
+    },
+    "bin": [
+        "bin/gitignore-add",
+        "bin/gitignore-remove"
+    ]
 }
