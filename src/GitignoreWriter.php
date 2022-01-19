@@ -44,8 +44,8 @@ class GitignoreWriter
 
     private function compareEntries(string $left, string $right): int
     {
-        $leftIsInvert = str_starts_with($left, '!');
-        $rightIsInvert = str_starts_with($right, '!');
+        $leftIsInvert = substr($left, 0, 1) === '!';
+        $rightIsInvert = substr($right, 0, 1) === '!';
 
         if ($leftIsInvert !== $rightIsInvert) {
             if ($leftIsInvert === true) {
