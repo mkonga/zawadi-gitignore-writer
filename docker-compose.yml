@@ -1,11 +1,11 @@
 version: "3"
 services:
     cli74:
-        image: registry.gitlab.com/tumia/php/7.4-cli-dev
+        image: registry.gitlab.com/tumia/php/cli-dev:7.4
         volumes:
             - .:/app
 
     cli81:
-        image: registry.gitlab.com/tumia/php/8.1-cli-dev
+        image: registry.gitlab.com/tumia/php/cli-dev:8.1
         volumes:
             - .:/app
