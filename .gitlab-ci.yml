@@ -1,10 +1,10 @@
-image: registry.gitlab.com/tumia/php/8.1-cli-dev
+image: registry.gitlab.com/tumia/php/cli-dev:8.1
 
 stages:
   - test
 
 test:
-  image: registry.gitlab.com/tumia/php/${PHP_VERSION}-cli-dev
+  image: registry.gitlab.com/tumia/php/cli-dev:${PHP_VERSION}
   parallel:
     matrix:
       - PHP_VERSION: ["7.4", "8.0", "8.1"]
