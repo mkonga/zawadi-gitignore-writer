@@ -20,4 +20,6 @@ test:
     - XDEBUG_MODE=coverage infection --no-progress --no-interaction
   artifacts:
     reports:
-      cobertura: phpunit.coverage.cobertura.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: phpunit.coverage.cobertura.xml
