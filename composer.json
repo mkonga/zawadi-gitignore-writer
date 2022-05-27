@@ -11,22 +11,13 @@
         "phpunit/phpunit": "^9.5.11"
     },
     "scripts": {
-        "phpcbf": "XDEBUG_MODE=off phpcbf",
-        "phpcs": "XDEBUG_MODE=off phpcbf --filter='GitModified'; XDEBUG_MODE=off phpcs",
-        "phpunit": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-cobertura=phpunit.coverage.cobertura.xml",
-        "psalm": "XDEBUG_MODE=off psalm",
-        "infection": "XDEBUG_MODE=coverage infection -j25 -n",
         "pre-commit": [
-            "@analyse",
-            "@test"
-        ],
-        "analyse": [
-            "@phpcs",
-            "@psalm"
-        ],
-        "test": [
-            "@phpunit",
-            "@infection"
+            "XDEBUG_MODE=off phpcbf --filter='GitModified'; XDEBUG_MODE=off phpcs",
+            "XDEBUG_MODE=off psalm",
+            "XDEBUG_MODE=off composer validate",
+            "XDEBUG_MODE=off composer-require-checker",
+            "XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-cobertura=phpunit.coverage.cobertura.xml",
+            "XDEBUG_MODE=coverage infection -j25 -n"
         ]
     },
     "config": {
