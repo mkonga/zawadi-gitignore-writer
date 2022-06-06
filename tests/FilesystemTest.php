@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zawadi\GitIgnoreWriter\Tests;
+namespace Zawadi\GitignoreWriter\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Zawadi\GitignoreWriter\Filesystem;

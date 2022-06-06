@@ -16,4 +16,13 @@
 
     <rule ref="Zawadi"/>
 
+    <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
+        <properties>
+            <property name="rootNamespaces" type="array">
+                <element key="src" value="Zawadi\GitignoreWriter" />
+                <element key="tests" value="Zawadi\GitignoreWriter\Tests" />
+            </property>
+        </properties>
+    </rule>
+
 </ruleset>

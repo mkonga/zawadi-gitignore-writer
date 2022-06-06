@@ -16,7 +16,7 @@ class GitignoreWriter
     /**
      * @param string $filename
      */
-    public function __construct(string $filename, string $section, FilesystemInterface $filesystem = null)
+    public function __construct(string $filename, string $section, ?FilesystemInterface $filesystem = null)
     {
         $this->filename = $filename;
         $this->section = $section;
@@ -75,10 +75,10 @@ class GitignoreWriter
             sprintf(
                 '/###> %s >###(.*?)###< %s <###/ms',
                 preg_quote($this->section, '/'),
-                preg_quote($this->section, '/')
+                preg_quote($this->section, '/'),
             ),
             $fileContents,
-            $matches
+            $matches,
         );
 
         if ($preg_match !== 1) {
@@ -114,12 +114,12 @@ class GitignoreWriter
             sprintf(
                 '/\n###> %s >###\n.*?\n###< %s <###\n/ms',
                 preg_quote($this->section, '/'),
-                preg_quote($this->section, '/')
+                preg_quote($this->section, '/'),
             ),
             $newSection,
             $contents,
             1,
-            $count
+            $count,
         );
 
         if ($count === 0) {
@@ -149,7 +149,7 @@ class GitignoreWriter
             implode(PHP_EOL, $entries),
             PHP_EOL,
             $this->section,
-            PHP_EOL
+            PHP_EOL,
         );
     }
 

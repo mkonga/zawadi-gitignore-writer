@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zawadi\GitIgnoreWriter\Tests;
+namespace Zawadi\GitignoreWriter\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Zawadi\GitignoreWriter\GitignoreWriter;
@@ -10,8 +10,8 @@ use Zawadi\GitignoreWriter\MemoryFilesystem;
 
 /**
  * @covers \Zawadi\GitignoreWriter\GitignoreWriter
- * @uses   \Zawadi\GitignoreWriter\FilesystemInterface
- * @uses   \Zawadi\GitignoreWriter\MemoryFilesystem
+ * @uses \Zawadi\GitignoreWriter\FilesystemInterface
+ * @uses \Zawadi\GitignoreWriter\MemoryFilesystem
  */
 final class GitIgnoreWriterTest extends TestCase
 {
@@ -78,7 +78,7 @@ final class GitIgnoreWriterTest extends TestCase
         // check original content is still there
         self::assertStringStartsWith(
             $initialContent . PHP_EOL,
-            (string)$this->filesystem->getFileContents($this->filename)
+            (string)$this->filesystem->getFileContents($this->filename),
         );
 
         // check removal
@@ -210,7 +210,7 @@ final class GitIgnoreWriterTest extends TestCase
         self::assertEquals(['other.txt', 'same.txt'], $gitignoreWriter->getEntries());
         self::assertEquals(
             1,
-            substr_count((string)$this->filesystem->getFileContents($this->filename), 'other.txt')
+            substr_count((string)$this->filesystem->getFileContents($this->filename), 'other.txt'),
         );
     }
 
@@ -271,8 +271,8 @@ final class GitIgnoreWriterTest extends TestCase
             2,
             substr_count(
                 (string)$this->filesystem->getFileContents($this->filename),
-                '###> coolsection >###'
-            )
+                '###> coolsection >###',
+            ),
         );
 
         // check that only first section is read
@@ -287,8 +287,8 @@ final class GitIgnoreWriterTest extends TestCase
             1,
             substr_count(
                 (string)$this->filesystem->getFileContents($this->filename),
-                '###> coolsection >###'
-            )
+                '###> coolsection >###',
+            ),
         );
     }
 
@@ -312,11 +312,11 @@ final class GitIgnoreWriterTest extends TestCase
     {
         yield 'normal' => [
             'inputEntries' => ['standard', 'before'],
-            'expectedFoundEntries' => ['before', 'standard']
+            'expectedFoundEntries' => ['before', 'standard'],
         ];
         yield 'withinvert' => [
             'inputEntries' => ['!aaaa', 'standard', 'before'],
-            'expectedFoundEntries' => ['before', 'standard', '!aaaa']
+            'expectedFoundEntries' => ['before', 'standard', '!aaaa'],
         ];
         yield 'biggercollection' => [
             'inputEntries' => [
@@ -333,8 +333,8 @@ final class GitIgnoreWriterTest extends TestCase
                 'standard',
                 '!aaaa',
                 '!bbbbb',
-                '!stan'
-            ]
+                '!stan',
+            ],
         ];
     }
 }

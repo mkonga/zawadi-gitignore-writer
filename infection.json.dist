@@ -12,7 +12,10 @@
         "text": "./infection.log"
     },
     "mutators": {
-        "@default": true
+        "@default": true,
+        "global-ignoreSourceCodeByRegex": [
+            "\\\\?assert(.*)"
+        ]
     },
     "testFramework": "phpunit"
 }
